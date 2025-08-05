@@ -10,8 +10,6 @@ A Task Management System built with **React**, **Node.js**, **Express**, and **M
 - API routes
 - Responsive UI
 
----
-
 ## Tech Stack
 
 ### Frontend
