@@ -1,5 +1,9 @@
 const Task = require('../models/Task');
 
+console.log('taskController loaded');
+console.log('Available exports:', module.exports);
+
+
 exports.createTask = async (req, res) => {
   try {
     const task = new Task(req.body);
@@ -12,10 +16,29 @@ exports.createTask = async (req, res) => {
 
 exports.getAllTasks = async (req, res) => {
   try {
-    const tasks = await Task.find();
+    console.log('Incoming query params:', req.query);
+
+    const { search, status } = req.query;
+    let query = {};
+
+    if (typeof search === 'string' && search.trim() !== '') {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    if (typeof status === 'string' && status !== 'All') {
+      query.status = status;
+    }
+
+    console.log('MongoDB query object:', query);
+
+    const tasks = await Task.find(query);
     res.json(tasks);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch tasks' });
+    console.error('Error in getAllTasks:', err);
+    res.status(500).json({ error: 'Failed to fetch tasks', details: err.message });
   }
 };
 
